@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CONNECT HUB</title>
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#f3f5f9;color:#202536}
+header{background:#182b49;color:white;padding:16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+header h2{font-size:21px}
+button{border:0;border-radius:8px;padding:10px 14px;background:#246bfe;color:white;cursor:pointer;font-weight:bold}
+button:hover{opacity:.88}
+input,textarea{width:100%;padding:12px;margin:7px 0;border:1px solid #ddd;border-radius:8px;font:inherit}
+textarea{resize:vertical}
+.auth{max-width:420px;margin:55px auto;background:white;padding:25px;border-radius:14px;box-shadow:0 4px 20px #0001}
+.auth h2{text-align:center;margin-bottom:18px}
+.auth button{width:100%;margin-top:8px}
+.google{background:#333}
+.hidden{display:none!important}
+nav{display:flex;gap:7px;overflow-x:auto;padding:10px;background:white;position:sticky;top:57px;z-index:4}
+nav button{white-space:nowrap;font-size:12px;padding:10px}
+main{max-width:850px;margin:20px auto;padding:0 12px}
+.card{background:white;padding:17px;border-radius:12px;margin-bottom:14px;box-shadow:0 2px 10px #00000008}
+.card h3{margin-bottom:10px}
+.muted{color:#777;font-size:13px}
+.row{display:flex;gap:10px;align-items:center}
+.row button{white-space:nowrap}
+.avatar{width:42px;height:42px;border-radius:50%;background:#246bfe;color:white;display:grid;place-items:center;font-weight:bold}
+.post{line-height:1.6;white-space:pre-wrap;margin:12px 0}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.actions button{font-size:12px}
+.item{padding:12px 0;border-bottom:1px solid #eee}
+.item:last-child{border:0}
+#messages{height:350px;overflow-y:auto;background:#f5f7fb;padding:12px;border-radius:10px;margin:12px 0}
+.message{background:white;padding:10px;border-radius:10px;margin:8px 0;max-width:85%;overflow-wrap:anywhere}
+.mine{background:#dce9ff;margin-left:auto}
+small{color:#777}
+.empty{text-align:center;color:#888;padding:25px}
+footer{text-align:center;color:#888;padding:25px;font-size:12px}
+</style>
+</head>
+
+<body>
+
+<header>
+<h2>CONNECT HUB</h2>
+<button id="logoutBtn" class="hidden" onclick="logout()">Logout</button>
+</header>
+
+<section id="authSection" class="auth">
+<h2>Welcome to CONNECT HUB</h2>
+<p class="muted" style="text-align:center">Connect with people around the world.</p>
+
+<input id="nameInput" placeholder="Your full name">
+<input id="emailInput" type="email" placeholder="Email address">
+<input id="passwordInput" type="password" placeholder="Password">
+
+<button onclick="register()">Create account</button>
+<button onclick="login()">Login</button>
+<button class="google" onclick="googleLogin()">Continue with Google</button>
+
+<p id="authMessage" class="muted" style="margin-top:12px;text-align:center"></p>
+</section>
+
+<div id="app" class="hidden">
+
+<nav>
+<button onclick="showPage('home')">Home</button>
+<button onclick="showPage('discover')">Discover</button>
+<button onclick="showPage('requests')">Requests</button>
+<button onclick="showPage('friends')">Friends</button>
+<button onclick="showPage('chats')">Chats</button>
+<button onclick="showPage('communities')">Communities</button>
+<button onclick="showPage('profile')">Profile</button>
+<button onclick="showPage('notifications')">Notifications</button>
+</nav>
+
+<main>
+
+<section id="homePage" class="page">
+<div class="card">
+<h3>What's happening?</h3>
+<textarea id="postInput" maxlength="2000" placeholder="Share something with everyone..."></textarea>
+<button onclick="createPost()">Publish Post</button>
+</div>
+<div id="feed"></div>
+</section>
+
+<section id="discoverPage" class="page hidden">
+<div class="card">
+<h3>Discover People</h3>
+<input id="searchInput" placeholder="Search by name or username..." oninput="searchPeople()">
+<div id="peopleList"></div>
+</div>
+</section>
+
+<section id="requestsPage" class="page hidden">
+<div class="card">
+<h3>Friend Requests</h3>
+<div id="requestList"></div>
+</div>
+</section>
+
+<section id="friendsPage" class="page hidden">
+<div class="card">
+<h3>My Friends</h3>
+<div id="friendsList"></div>
+</div>
+</section>
+
+<section id="chatsPage" class="page hidden">
+<div class="card">
+<h3>My Chats</h3>
+<div id="chatContacts"></div>
+</div>
+</section>
+
+<section id="chatPage" class="page hidden">
+<div class="card">
+<button onclick="showPage('chats')">Back to Chats</button>
+<h3 id="chatTitle" style="margin-top:15px">Private Chat</h3>
+<div id="messages"></div>
+<textarea id="messageInput" maxlength="2000" placeholder="Write a message..."></textarea>
+<button onclick="sendMessage()">Send Message</button>
+</div>
+</section>
+
+<section id="communitiesPage" class="page hidden">
+<div class="card">
+<h3>Communities</h3>
+<input id="communityName" maxlength="50" placeholder="Community name">
+<input id="communityDescription" maxlength="200" placeholder="Description">
+<button onclick="createCommunity()">Create Community</button>
+</div>
+<div class="card">
+<h3>Explore Communities</h3>
+<div id="communityList"></div>
+</div>
+</section>
+
+<section id="profilePage" class="page hidden">
+<div class="card">
+<h3>My Profile</h3>
+<input id="profileName" placeholder="Your name">
+<input id="profileUsername" placeholder="Username">
+<textarea id="profileBio" maxlength="300" placeholder="Tell people about yourself"></textarea>
+<button onclick="saveProfile()">Save Profile</button>
+<p id="profileEmail" class="muted" style="margin-top:12px"></p>
+</div>
+</section>
+
+<section id="notificationsPage" class="page hidden">
+<div class="card">
+<h3>Notifications</h3>
+<div id="notificationList"></div>
+</div>
+</section>
+
+</main>
+</div>
+
+<footer>CONNECT HUB · Connecting people worldwide</footer>
+
+<script type="module">
+
+import {initializeApp}
+from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
+
+import {
+getAuth,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+GoogleAuthProvider,
+signInWithPopup,
+onAuthStateChanged,
+signOut,
+updateProfile
+}
+from "https://www.gstatic.com/firebasejs/11.6.0/firebase-auth.js";
+
+import {
+getFirestore,
+collection,
+doc,
+setDoc,
+getDoc,
+getDocs,
+addDoc,
+deleteDoc,
+updateDoc,
+query,
+where,
+orderBy,
+onSnapshot,
+serverTimestamp,
+limit
+}
+from "https://www.gstatic.com/firebasejs/11.6.0/firebase-firestore.js";
+
+// YOUR FIREBASE CONFIGURATION
+const firebaseConfig = {
+apiKey: "AIzaSyAMO8O4vh1nkKxxS2J1-EYtHCw0Sxg51Vk",
+authDomain: "connect-hub-d183a.firebaseapp.com",
+projectId: "connect-hub-d183a",
+storageBucket: "connect-hub-d183a.firebasestorage.app",
+messagingSenderId: "175835875152",
+appId: "1:175835875152:web:5eece1581716a2854cce55",
+measurementId: "G-HL4HPENGCT"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+let currentUser = null;
+let activeChat = null;
+let stopMessages = null;
+let allPeople = [];
+let allFriends = [];
+
+const $ = id => document.getElementById(id);
+
+function message(text){
+$("authMessage").textContent = text;
+}
+
+function safe(value){
+return String(value ?? "").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+}
+
+function pairId(a,b){
+return [a,b].sort().join("_");
+}
+
+async function createUserProfile(user,name){
+const ref = doc(db,"users",user.uid);
+const snap = await getDoc(ref);
+
+if(!snap.exists()){
+await setDoc(ref,{
+uid:user.uid,
+displayName:name || user.displayName || "New Member",
+username:"user_"+user.uid.slice(0,7),
+email:user.email || "",
+bio:"",
+createdAt:serverTimestamp()
+});
+}
+}
+
+window.register = async function(){
+const name = $("nameInput").value.trim();
+const email = $("emailInput").value.trim();
+const password = $("passwordInput").value;
+
+if(!name || !email || password.length < 6){
+message("Enter your name, email and a password of at least 6 characters.");
+return;
+}
+
+try{
+const result = await createUserWithEmailAndPassword(auth,email,password);
+await updateProfile(result.user,{displayName:name});
+await createUserProfile(result.user,name);
+message("Account created!");
+}catch(e){
+message(e.message);
+}
+};
+
+window.login = async function(){
+try{
+await signInWithEmailAndPassword(
+auth,
+$("emailInput").value.trim(),
+$("passwordInput").value
+);
+}catch(e){
+message(e.message);
+}
+};
+
+window.googleLogin = async function(){
+try{
+const result = await signInWithPopup(auth,googleProvider);
+await createUserProfile(result.user,result.user.displayName);
+}catch(e){
+message(e.message);
+}
+};
+
+window.logout = async function(){
+if(stopMessages) stopMessages();
+await signOut(auth);
+};
+
+onAuthStateChanged(auth,async user=>{
+currentUser = user;
+
+$("authSection").classList.toggle("hidden",!!user);
+$("app").classList.toggle("hidden",!user);
+$("logoutBtn").classList.toggle("hidden",!user);
+
+if(user){
+try{
+await createUserProfile(user,user.displayName);
+await loadProfile();
+await loadFeed();
+showPage("home");
+}catch(e){
+alert("Could not load your account: "+e.message);
+}
+}else{
+if(stopMessages) stopMessages();
+stopMessages=null;
+activeChat=null;
+}
+});
+
+window.showPage = async function(page){
+document.querySelectorAll(".page").forEach(p=>p.classList.add("hidden"));
+$(page+"Page").classList.remove("hidden");
+
+if(page!=="chat" && stopMessages){
+stopMessages();
+stopMessages=null;
+}
+
+if(page==="home") loadFeed();
+if(page==="discover") loadPeople();
+if(page==="requests") loadRequests();
+if(page==="friends") loadFriends();
+if(page==="chats") loadChatContacts();
+if(page==="communities") loadCommunities();
+if(page==="profile") loadProfile();
+if(page==="notifications") loadNotifications();
+};
+
+// PROFILE
+
+async function loadProfile(){
+const snap = await getDoc(doc(db,"users",currentUser.uid));
+const data = snap.data() || {};
+
+$("profileName").value = data.displayName || "";
+$("profileUsername").value = data.username || "";
+$("profileBio").value = data.bio || "";
+$("profileEmail").textContent = currentUser.email || "";
+}
+
+window.saveProfile = async function(){
+const name = $("profileName").value.trim();
+const username = $("profileUsername").value.trim().replace(/^@/,"").toLowerCase();
+const bio = $("profileBio").value.trim();
+
+if(!name || !username){
+alert("Name and username are required.");
+return;
+}
+
+if(!/^[a-z0-9_]{3,20}$/.test(username)){
+alert("Username must be 3–20 characters using letters, numbers or underscores.");
+return;
+}
+
+try{
+const users = await getDocs(collection(db,"users"));
+const taken = users.docs.some(d=>
+d.id!==currentUser.uid &&
+(d.data().username || "").toLowerCase()===username
+);
+
+if(taken){
+alert("That username is already taken.");
+return;
+}
+
+await updateDoc(doc(db,"users",currentUser.uid),{
+displayName:name,
+username,
+bio
+});
+
+await updateProfile(currentUser,{displayName:name});
+alert("Profile updated!");
+}catch(e){
+alert(e.message);
+}
+};
+
+// POSTS
+
+window.createPost = async function(){
+const text = $("postInput").value.trim();
+if(!text) return;
+
+try{
+await addDoc(collection(db,"posts"),{
+uid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
+});
+$("postInput").value="";
+loadFeed();
+}catch(e){
+alert(e.message);
+}
+};
+
+async function loadFeed(){
+const box = $("feed");
+box.innerHTML='<p class="empty">Loading posts...</p>';
+
+try{
+const snap = await getDocs(query(
+collection(db,"posts"),
+orderBy("createdAt","desc"),
+limit(50)
+));
+
+box.innerHTML="";
+
+for(const post of snap.docs){
+const d = post.data();
+const userSnap = await getDoc(doc(db,"users",d.uid));
+const person = userSnap.data() || {};
+const likes = await getDocs(collection(db,"posts",post.id,"likes"));
+
+const card = document.createElement("div");
+card.className="card";
+card.innerHTML=`
+<div class="row">
+<div class="avatar">${safe((person.displayName||"U").charAt(0).toUpperCase())}</div>
+<div><b>${safe(person.displayName||"Member")}</b><br>
+<small>@${safe(person.username||"member")}</small></div>
+</div>
+<div class="post">${safe(d.text)}</div>
+<div class="actions">
+<button class="likeBtn">Like (${likes.size})</button>
+<button class="commentBtn">Comment</button>
+${d.uid===currentUser.uid?'<button class="deleteBtn">Delete</button>':''}
+</div>
+<div class="comments hidden"></div>
+`;
+
+card.querySelector(".likeBtn").onclick=()=>toggleLike(post.id);
+card.querySelector(".commentBtn").onclick=()=>showComments(post.id,card.querySelector(".comments"));
+
+if(d.uid===currentUser.uid){
+card.querySelector(".deleteBtn").onclick=async()=>{
+if(confirm("Delete this post?")){
+await deleteDoc(doc(db,"posts",post.id));
+loadFeed();
+}
+};
+}
+
+box.appendChild(card);
+}
+
+if(!snap.size) box.innerHTML='<p class="empty">No posts yet. Be the first to share something!</p>';
+
+}catch(e){
+box.innerHTML='<p class="empty">Could not load posts: '+safe(e.message)+'</p>';
+}
+}
+
+async function toggleLike(postId){
+const id = currentUser.uid;
+const ref = doc(db,"posts",postId,"likes",id);
+const snap = await getDoc(ref);
+
+if(snap.exists()) await deleteDoc(ref);
+else await setDoc(ref,{uid:id,createdAt:serverTimestamp()});
+
+loadFeed();
+}
+
+async function showComments(postId,box){
+box.classList.toggle("hidden");
+
+if(box.classList.contains("hidden")) return;
+
+const snap = await getDocs(query(
+collection(db,"posts",postId,"comments"),
+orderBy("createdAt","asc")
+));
+
+box.innerHTML=`
+<div style="margin-top:12px">
+<input class="commentInput" placeholder="Write a comment...">
+<button class="addComment">Send</button>
+</div>`;
+
+for(const c of snap.docs){
+const d=c.data();
+const p=await getDoc(doc(db,"users",d.uid));
+const name=p.data()?.displayName || "Member";
+const line=document.createElement("p");
+line.style.marginTop="8px";
+line.textContent=name+": "+d.text;
+box.appendChild(line);
+}
+
+box.querySelector(".addComment").onclick=async()=>{
+const text=box.querySelector(".commentInput").value.trim();
+if(!text)return;
+
+await addDoc(collection(db,"posts",postId,"comments"),{
+uid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
+});
+
+showComments(postId,box);
+};
+}
+
+// DISCOVER PEOPLE
+
+async function loadPeople(){
+const snap=await getDocs(collection(db,"users"));
+allPeople=snap.docs.map(d=>d.data()).filter(p=>p.uid!==currentUser.uid);
+renderPeople(allPeople);
+}
+
+window.searchPeople=function(){
+const term=$("searchInput").value.toLowerCase().trim();
+renderPeople(allPeople.filter(p=>
+(p.displayName||"").toLowerCase().includes(term) ||
+(p.username||"").toLowerCase().includes(term)
+));
+};
+
+function renderPeople(people){
+const box=$("peopleList");
+box.innerHTML="";
+
+if(!people.length){
+box.innerHTML='<p class="empty">No people found.</p>';
+return;
+}
+
+people.forEach(p=>{
+const item=document.createElement("div");
+item.className="item";
+item.innerHTML=`
+<div class="row">
+<div class="avatar">${safe((p.displayName||"U")[0].toUpperCase())}</div>
+<div style="flex:1"><b>${safe(p.displayName)}</b><br>
+<small>@${safe(p.username||"member")}</small></div>
+<button>Connect</button>
+</div>`;
+
+item.querySelector("button").onclick=()=>sendRequest(p.uid);
+box.appendChild(item);
+});
+}
+
+// FRIEND REQUESTS
+
+window.sendRequest=async function(receiverUid){
+const id=currentUser.uid+"_"+receiverUid;
+const ref=doc(db,"friendRequests",id);
+const snap=await getDoc(ref);
+
+if(snap.exists()){
+alert("A request already exists.");
+return;
+}
+
+try{
+await setDoc(ref,{
+senderUid:currentUser.uid,
+receiverUid,
+status:"pending",
+createdAt:serverTimestamp()
+});
+alert("Friend request sent!");
+}catch(e){
+alert(e.message);
+}
+};
+
+async function loadRequests(){
+const box=$("requestList");
+box.innerHTML="Loading...";
+
+const snap=await getDocs(query(
+collection(db,"friendRequests"),
+where("receiverUid","==",currentUser.uid),
+where("status","==","pending")
+));
+
+box.innerHTML="";
+
+for(const r of snap.docs){
+const d=r.data();
+const p=await getDoc(doc(db,"users",d.senderUid));
+const person=p.data()||{};
+
+const item=document.createElement("div");
+item.className="item";
+item.innerHTML=`
+<b>${safe(person.displayName||"Member")}</b>
+<div class="actions" style="margin-top:8px">
+<button class="accept">Accept</button>
+<button class="decline">Decline</button>
+</div>`;
+
+item.querySelector(".accept").onclick=async()=>{
+await updateDoc(doc(db,"friendRequests",r.id),{status:"accepted"});
+loadRequests();
+};
+
+item.querySelector(".decline").onclick=async()=>{
+await deleteDoc(doc(db,"friendRequests",r.id));
+loadRequests();
+};
+
+box.appendChild(item);
+}
+
+if(!snap.size)box.innerHTML='<p class="empty">No pending requests.</p>';
+}
+
+// FRIENDS
+
+async function getMyFriends(){
+const snap=await getDocs(collection(db,"friendRequests"));
+const ids=[];
+
+snap.docs.forEach(d=>{
+const x=d.data();
+if(x.status==="accepted"){
+if(x.senderUid===currentUser.uid)ids.push(x.receiverUid);
+if(x.receiverUid===currentUser.uid)ids.push(x.senderUid);
+}
+});
+
+return [...new Set(ids)];
+}
+
+async function loadFriends(){
+const box=$("friendsList");
+box.innerHTML="Loading...";
+
+const ids=await getMyFriends();
+allFriends=[];
+
+for(const uid of ids){
+const p=await getDoc(doc(db,"users",uid));
+if(p.exists())allFriends.push(p.data());
+}
+
+box.innerHTML="";
+
+allFriends.forEach(p=>{
+const item=document.createElement("div");
+item.className="item";
+item.innerHTML=`
+<div class="row">
+<b style="flex:1">${safe(p.displayName)}</b>
+<button>Chat</button>
+</div>`;
+
+item.querySelector("button").onclick=()=>startChat(p.uid,p.displayName);
+box.appendChild(item);
+});
+
+if(!ids.length)box.innerHTML='<p class="empty">You have no friends yet. Discover people to connect!</p>';
+}
+
+// CHATS
+
+async function loadChatContacts(){
+const box=$("chatContacts");
+box.innerHTML="Loading...";
+
+const ids=await getMyFriends();
+box.innerHTML="";
+
+for(const uid of ids){
+const p=await getDoc(doc(db,"users",uid));
+if(!p.exists())continue;
+
+const person=p.data();
+const item=document.createElement("div");
+item.className="item";
+item.innerHTML=`
+<div class="row">
+<b style="flex:1">${safe(person.displayName)}</b>
+<button>Open Chat</button>
+</div>`;
+
+item.querySelector("button").onclick=()=>startChat(uid,person.displayName);
+box.appendChild(item);
+}
+
+if(!ids.length)box.innerHTML='<p class="empty">Add friends before starting a chat.</p>';
+}
+
+window.startChat=async function(otherUid,name){
+try{
+const participants=[currentUser.uid,otherUid].sort();
+const chatId=pairId(currentUser.uid,otherUid);
+
+const ref=doc(db,"chats",chatId);
+const snap=await getDoc(ref);
+
+if(!snap.exists()){
+await setDoc(ref,{
+participants,
+createdAt:serverTimestamp()
+});
+}
+
+activeChat=chatId;
+$("chatTitle").textContent="Chat with "+name;
+showPage("chat");
+
+if(stopMessages)stopMessages();
+
+stopMessages=onSnapshot(query(
+collection(db,"chats",chatId,"messages"),
+orderBy("createdAt","asc")
+),snap=>{
+const box=$("messages");
+box.innerHTML="";
+
+snap.forEach(m=>{
+const d=m.data();
+const div=document.createElement("div");
+div.className="message "+(d.senderUid===currentUser.uid?"mine":"");
+div.textContent=d.text;
+box.appendChild(div);
+});
+
+box.scrollTop=box.scrollHeight;
+});
+}catch(e){
+alert("Could not open chat: "+e.message);
+}
+};
+
+window.sendMessage=async function(){
+const text=$("messageInput").value.trim();
+if(!text||!activeChat)return;
+
+try{
+await addDoc(collection(db,"chats",activeChat,"messages"),{
+senderUid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
+});
+$("messageInput").value="";
+}catch(e){
+alert("Message could not be sent: "+e.message);
+}
+};
+
+// COMMUNITIES
+
+async function loadCommunities(){
+const box=$("communityList");
+box.innerHTML="Loading...";
+
+const snap=await getDocs(collection(db,"communities"));
+box.innerHTML="";
+
+for(const c of snap.docs){
+const d=c.data();
+const item=document.createElement("div");
+item.className="item";
+item.innerHTML=`
+<b>${safe(d.name)}</b>
+<p class="muted">${safe(d.description||"")}</p>
+<button>Join Community</button>`;
+
+item.querySelector("button").onclick=async()=>{
+try{
+await setDoc(doc(db,"communities",c.id,"members",currentUser.uid),{
+uid:currentUser.uid,
+joinedAt:serverTimestamp()
+});
+alert("You joined the community!");
+}catch(e){alert(e.message);}
+};
+
+box.appendChild(item);
+}
+
+if(!snap.size)box.innerHTML='<p class="empty">No communities yet. Create one!</p>';
+}
+
+window.createCommunity=async function(){
+const name=$("communityName").value.trim();
+const description=$("communityDescription").value.trim();
+
+if(!name)return alert("Enter a community name.");
+
+try{
+await addDoc(collection(db,"communities"),{
+name,
+description,
+ownerUid:currentUser.uid,
+createdAt:serverTimestamp()
+});
+
+$("communityName").value="";
+$("communityDescription").value="";
+loadCommunities();
+}catch(e){alert(e.message);}
+};
+
+// NOTIFICATIONS
+
+async function loadNotifications(){
+const box=$("notificationList");
+box.innerHTML="Loading...";
+
+const snap=await getDocs(query(
+collection(db,"friendRequests"),
+where("receiverUid","==",currentUser.uid),
+orderBy("createdAt","desc"),
+limit(30)
+));
+
+box.innerHTML="";
+
+for(const r of snap.docs){
+const d=r.data();
+const p=await getDoc(doc(db,"users",d.senderUid));
+const name=p.data()?.displayName||"Someone";
+
+const item=document.createElement("div");
+item.className="item";
+item.textContent=name+" sent you a friend request. Status: "+d.status;
+box.appendChild(item);
+}
+
+if(!snap.size)box.innerHTML='<p class="empty">No notifications yet.</p>';
+}
+
+</script>
+</body>
+</html>
