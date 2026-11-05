@@ -5,12 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#080d1b">
 <title>CONNECT HUB</title>
+
 <style>
-:root{--bg:#080d1b;--surface:#111a2e;--surface2:#17233b;--purple:#8157ff;--cyan:#21d4fd;--text:#f4f6ff;--muted:#9ba8c2;--border:#293650}
+:root{
+--bg:#080d1b;--surface:#111a2e;--surface2:#17233b;
+--purple:#8157ff;--cyan:#21d4fd;--text:#f4f6ff;
+--muted:#9ba8c2;--border:#293650;
+}
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-header{background:linear-gradient(110deg,#17102f,#142c49);padding:15px 16px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border)}
-header h2{font-size:21px;letter-spacing:1px;color:var(--cyan)}
+header{background:linear-gradient(110deg,#17102f,#142c49);padding:15px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10;border-bottom:1px solid var(--border)}
+header h2{font-size:21px;color:var(--cyan)}
 button{border:0;border-radius:10px;padding:11px 15px;background:linear-gradient(110deg,var(--purple),#5942d8);color:white;font-weight:bold;cursor:pointer}
 input,textarea{width:100%;padding:13px;margin:8px 0;border:1px solid var(--border);border-radius:10px;background:#0b1427;color:white;font:inherit;outline:none}
 textarea{resize:vertical;min-height:75px}
@@ -39,9 +44,17 @@ main{max-width:850px;margin:22px auto;padding:0 13px}
 .mine{background:linear-gradient(120deg,#6748d9,#4058c9);margin-left:auto}
 .profile-photo{width:90px;height:90px;border-radius:22px;object-fit:cover;border:2px solid var(--cyan);margin:10px 0}
 footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
-@media(max-width:600px){header h2{font-size:19px}nav{top:53px}main{margin:15px auto;padding:0 10px}.card{padding:14px}.auth{margin:20px 12px;padding:20px}#messages{height:290px}}
+@media(max-width:600px){
+header h2{font-size:19px}
+nav{top:53px}
+main{margin:15px auto;padding:0 10px}
+.card{padding:14px}
+.auth{margin:20px 12px;padding:20px}
+#messages{height:290px}
+}
 </style>
 </head>
+
 <body>
 
 <header>
@@ -66,6 +79,7 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 </section>
 
 <div id="app" class="hidden">
+
 <nav>
 <button onclick="showPage('home')">Home</button>
 <button onclick="showPage('discover')">Discover</button>
@@ -78,6 +92,7 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 </nav>
 
 <main>
+
 <section id="homePage" class="page">
 <div class="card">
 <h3>What's happening?</h3>
@@ -96,15 +111,28 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 </section>
 
 <section id="requestsPage" class="page hidden">
-<div class="card"><h3>Friend Requests</h3><div id="requestList"></div></div>
+<div class="card">
+<h3>Incoming Requests</h3>
+<div id="requestList"></div>
+</div>
+<div class="card">
+<h3>Sent Requests</h3>
+<div id="sentRequestList"></div>
+</div>
 </section>
 
 <section id="friendsPage" class="page hidden">
-<div class="card"><h3>My Friends</h3><div id="friendsList"></div></div>
+<div class="card">
+<h3>My Friends</h3>
+<div id="friendsList"></div>
+</div>
 </section>
 
 <section id="chatsPage" class="page hidden">
-<div class="card"><h3>My Chats</h3><div id="chatContacts"></div></div>
+<div class="card">
+<h3>My Chats</h3>
+<div id="chatContacts"></div>
+</div>
 </section>
 
 <section id="chatPage" class="page hidden">
@@ -159,14 +187,19 @@ footer{text-align:center;color:var(--muted);padding:25px;font-size:12px}
 </section>
 
 <section id="notificationsPage" class="page hidden">
-<div class="card"><h3>Notifications</h3><div id="notificationList"></div></div>
+<div class="card">
+<h3>Notifications</h3>
+<div id="notificationList"></div>
+</div>
 </section>
+
 </main>
 </div>
 
 <footer>CONNECT HUB · Connecting people worldwide</footer>
 
 <script type="module">
+
 import {initializeApp} from "https://www.gstatic.com/firebasejs/11.6.0/firebase-app.js";
 
 import {
@@ -208,11 +241,18 @@ let peopleCache=[];
 let activeCommunity=null;
 
 const $=id=>document.getElementById(id);
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({
+"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[c]));
+
 const pairId=(a,b)=>[a,b].sort().join("_");
 
 function avatar(p){
-return `<div class="avatar">${p?.photoURL?`<img src="${esc(p.photoURL)}" alt="">`:esc((p?.displayName||"U").charAt(0).toUpperCase())}</div>`;
+return `<div class="avatar">${
+p?.photoURL?`<img src="${esc(p.photoURL)}" alt="">`:
+esc((p?.displayName||"U").charAt(0).toUpperCase())
+}</div>`;
 }
 
 async function uploadPhoto(file,uid){
@@ -255,6 +295,8 @@ createdAt:serverTimestamp(),read:false
 });
 }
 
+/* AUTHENTICATION */
+
 window.register=async()=>{
 const name=$("nameInput").value.trim();
 const username=$("usernameInput").value.trim().replace(/^@/,"").toLowerCase();
@@ -267,35 +309,61 @@ if(!name||!username||!email||!password){
 $("authMessage").textContent="Fill in your name, username, email and password.";
 return;
 }
+
 if(!/^[a-z0-9_]{3,20}$/.test(username)){
 $("authMessage").textContent="Username must be 3–20 letters, numbers or underscores.";
 return;
 }
+
 if(password.length<6){
 $("authMessage").textContent="Password must be at least 6 characters.";
 return;
 }
+
 try{
 $("authMessage").textContent="Creating account...";
 const result=await createUserWithEmailAndPassword(auth,email,password);
 let photoURL=file?await uploadPhoto(file,result.user.uid):"";
-await updateProfile(result.user,{displayName:name,...(photoURL?{photoURL}:{})});
-await ensureProfile(result.user,name,username,phone,photoURL);
+
+await updateProfile(result.user,{
+displayName:name,
+...(photoURL?{photoURL}:{})
+});
+
+await setDoc(doc(db,"users",result.user.uid),{
+uid:result.user.uid,
+displayName:name,
+username,
+phone,
+email,
+photoURL,
+bio:"",
+createdAt:serverTimestamp()
+});
+
 $("authMessage").textContent="Account created!";
-}catch(e){$("authMessage").textContent=e.message;}
+}catch(e){
+$("authMessage").textContent=e.message;
+}
 };
 
 window.login=async()=>{
 try{
-await signInWithEmailAndPassword(auth,$("emailInput").value.trim(),$("passwordInput").value);
-}catch(e){$("authMessage").textContent=e.message;}
+await signInWithEmailAndPassword(
+auth,$("emailInput").value.trim(),$("passwordInput").value
+);
+}catch(e){
+$("authMessage").textContent=e.message;
+}
 };
 
 window.googleLogin=async()=>{
 try{
 const r=await signInWithPopup(auth,provider);
 await ensureProfile(r.user);
-}catch(e){$("authMessage").textContent=e.message;}
+}catch(e){
+$("authMessage").textContent=e.message;
+}
 };
 
 window.logout=async()=>{
@@ -307,15 +375,19 @@ await signOut(auth);
 
 onAuthStateChanged(auth,async user=>{
 currentUser=user;
+
 $("authSection").classList.toggle("hidden",!!user);
 $("app").classList.toggle("hidden",!user);
 $("logoutBtn").classList.toggle("hidden",!user);
+
 if(user){
 try{
 await ensureProfile(user);
 await loadProfile();
 await showPage("home");
-}catch(e){alert("Loading error: "+e.message);}
+}catch(e){
+alert("Loading error: "+e.message);
+}
 }else{
 if(stopMessages)stopMessages();
 if(stopChatList)stopChatList();
@@ -323,11 +395,22 @@ stopMessages=stopChatList=null;
 }
 });
 
+/* NAVIGATION */
+
 window.showPage=async page=>{
 document.querySelectorAll(".page").forEach(x=>x.classList.add("hidden"));
 $(page+"Page").classList.remove("hidden");
-if(page!=="chat"&&stopMessages){stopMessages();stopMessages=null;}
-if(page!=="chats"&&stopChatList){stopChatList();stopChatList=null;}
+
+if(page!=="chat"&&stopMessages){
+stopMessages();
+stopMessages=null;
+}
+
+if(page!=="chats"&&stopChatList){
+stopChatList();
+stopChatList=null;
+}
+
 try{
 if(page==="home")await loadFeed();
 if(page==="discover")await loadPeople();
@@ -337,20 +420,28 @@ if(page==="chats")await loadChatContacts();
 if(page==="communities")await loadCommunities();
 if(page==="profile")await loadProfile();
 if(page==="notifications")await loadNotifications();
-}catch(e){alert(e.message);}
+}catch(e){
+alert(e.message);
+}
 };
+
+/* PROFILE */
 
 async function loadProfile(){
 const p=await profile(currentUser.uid);
+
 $("profileName").value=p.displayName||"";
 $("profileUsername").value=p.username||"";
 $("profilePhone").value=p.phone||"";
 $("profileBio").value=p.bio||"";
 $("profileEmail").textContent=currentUser.email||"";
+
 if(p.photoURL){
 $("profilePhoto").src=p.photoURL;
 $("profilePhoto").classList.remove("hidden");
-}else $("profilePhoto").classList.add("hidden");
+}else{
+$("profilePhoto").classList.add("hidden");
+}
 }
 
 window.saveProfile=async()=>{
@@ -363,47 +454,81 @@ const file=$("profilePhotoInput").files[0];
 if(!displayName||!/^[a-z0-9_]{3,20}$/.test(username)){
 return alert("Enter a name and valid username.");
 }
+
 try{
 const all=await getDocs(collection(db,"users"));
-if(all.docs.some(x=>x.id!==currentUser.uid&&(x.data().username||"").toLowerCase()===username)){
+
+if(all.docs.some(x=>
+x.id!==currentUser.uid&&
+(x.data().username||"").toLowerCase()===username
+)){
 return alert("Username already taken.");
 }
+
 const changes={displayName,username,phone,bio};
+
 if(file)changes.photoURL=await uploadPhoto(file,currentUser.uid);
+
 await updateDoc(doc(db,"users",currentUser.uid),changes);
-await updateProfile(currentUser,{displayName,...(changes.photoURL?{photoURL:changes.photoURL}:{})});
+
+await updateProfile(currentUser,{
+displayName,
+...(changes.photoURL?{photoURL:changes.photoURL}:{})
+});
+
 await loadProfile();
 alert("Profile saved.");
-}catch(e){alert(e.message);}
+}catch(e){
+alert(e.message);
+}
 };
+
+/* POSTS */
 
 window.createPost=async()=>{
 const text=$("postInput").value.trim();
 if(!text)return;
+
 try{
 await addDoc(collection(db,"posts"),{
-uid:currentUser.uid,text,createdAt:serverTimestamp()
+uid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
 });
+
 $("postInput").value="";
 await loadFeed();
-}catch(e){alert(e.message);}
+}catch(e){
+alert(e.message);
+}
 };
 
 async function loadFeed(){
 const box=$("feed");
 box.innerHTML='<p class="empty">Loading posts...</p>';
+
 try{
-const snap=await getDocs(query(collection(db,"posts"),orderBy("createdAt","desc"),limit(50)));
+const snap=await getDocs(query(
+collection(db,"posts"),
+orderBy("createdAt","desc"),
+limit(50)
+));
+
 box.innerHTML="";
+
 for(const post of snap.docs){
 const d=post.data();
 const p=await profile(d.uid);
 const likes=await getDocs(collection(db,"posts",post.id,"likes"));
+
 const card=document.createElement("div");
 card.className="card";
+
 card.innerHTML=`
-<div class="row">${avatar(p)}
-<div><b>${esc(p.displayName)}</b><br><small>@${esc(p.username||"member")}</small></div>
+<div class="row">
+${avatar(p)}
+<div><b>${esc(p.displayName)}</b><br>
+<small>@${esc(p.username||"member")}</small></div>
 </div>
 <div class="post">${esc(d.text)}</div>
 <div class="actions">
@@ -412,8 +537,10 @@ card.innerHTML=`
 ${d.uid===currentUser.uid?'<button class="delete">Delete</button>':""}
 </div>
 <div class="comments hidden"></div>`;
+
 card.querySelector(".like").onclick=()=>toggleLike(post.id);
 card.querySelector(".comment").onclick=()=>showComments(post.id,card.querySelector(".comments"));
+
 if(d.uid===currentUser.uid){
 card.querySelector(".delete").onclick=async()=>{
 if(confirm("Delete this post?")){
@@ -422,331 +549,699 @@ loadFeed();
 }
 };
 }
+
 box.appendChild(card);
 }
-if(!snap.size)box.innerHTML='<p class="empty">No posts yet. Be the first to post!</p>';
-}catch(e){box.innerHTML="Feed error: "+esc(e.message);}
+
+if(!snap.size){
+box.innerHTML='<p class="empty">No posts yet. Be the first to post!</p>';
+}
+}catch(e){
+box.innerHTML="Feed error: "+esc(e.message);
+}
 }
 
 async function toggleLike(id){
 try{
 const r=doc(db,"posts",id,"likes",currentUser.uid);
 const s=await getDoc(r);
+
 if(s.exists())await deleteDoc(r);
-else await setDoc(r,{uid:currentUser.uid,createdAt:serverTimestamp()});
+else await setDoc(r,{
+uid:currentUser.uid,
+createdAt:serverTimestamp()
+});
+
 await loadFeed();
-}catch(e){alert(e.message);}
+}catch(e){
+alert(e.message);
+}
 }
 
 async function showComments(postId,box){
 box.classList.toggle("hidden");
 if(box.classList.contains("hidden"))return;
+
 box.innerHTML="Loading comments...";
+
 try{
-const snap=await getDocs(query(collection(db,"posts",postId,"comments"),orderBy("createdAt","asc")));
-box.innerHTML='<input class="commentText" maxlength="1000" placeholder="Write a comment..."><button class="sendComment">Send Comment</button><div class="commentRows"></div>';
+const snap=await getDocs(query(
+collection(db,"posts",postId,"comments"),
+orderBy("createdAt","asc")
+));
+
+box.innerHTML=`
+<input class="commentText" maxlength="1000" placeholder="Write a comment...">
+<button class="sendComment">Send Comment</button>
+<div class="commentRows"></div>`;
+
 for(const c of snap.docs){
-const d=c.data(),p=await profile(d.uid),el=document.createElement("p");
+const d=c.data();
+const p=await profile(d.uid);
+const el=document.createElement("p");
 el.className="item";
 el.textContent=(p.displayName||"Member")+": "+d.text;
 box.querySelector(".commentRows").appendChild(el);
 }
+
 box.querySelector(".sendComment").onclick=async()=>{
 const text=box.querySelector(".commentText").value.trim();
 if(!text)return;
+
 try{
 await addDoc(collection(db,"posts",postId,"comments"),{
-uid:currentUser.uid,text,createdAt:serverTimestamp()
+uid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
 });
 showComments(postId,box);
-}catch(e){alert(e.message);}
-};
-}catch(e){box.textContent=e.message;}
+}catch(e){
+alert(e.message);
 }
+};
+}catch(e){
+box.textContent=e.message;
+}
+}
+
+/* DISCOVER PEOPLE */
 
 async function loadPeople(){
 const snap=await getDocs(collection(db,"users"));
-peopleCache=snap.docs.map(x=>x.data()).filter(p=>p.uid!==currentUser.uid);
+
+peopleCache=snap.docs
+.map(x=>x.data())
+.filter(p=>p.uid!==currentUser.uid);
+
 renderPeople(peopleCache);
 }
 
 window.searchPeople=()=>{
 const t=$("searchInput").value.toLowerCase().trim();
+
 renderPeople(peopleCache.filter(p=>
 (p.displayName||"").toLowerCase().includes(t)||
 (p.username||"").toLowerCase().includes(t)
 ));
 };
 
-function renderPeople(list){
-const box=$("peopleList");
-box.innerHTML="";
-if(!list.length){box.innerHTML='<p class="empty">No people found.</p>';return;}
-list.forEach(p=>{
-const el=document.createElement("div");
-el.className="item";
-el.innerHTML=`<div class="row">${avatar(p)}<div><b>${esc(p.displayName)}</b><br><small>@${esc(p.username||"member")}</small></div><button>Connect</button></div>`;
-el.querySelector("button").onclick=()=>sendRequest(p.uid);
-box.appendChild(el);
-});
+async function getRequestBetween(a,b){
+const q1=await getDocs(query(
+collection(db,"friendRequests"),
+where("senderUid","==",a),
+where("receiverUid","==",b)
+));
+
+if(!q1.empty)return q1.docs[0];
+
+const q2=await getDocs(query(
+collection(db,"friendRequests"),
+where("senderUid","==",b),
+where("receiverUid","==",a)
+));
+
+return q2.empty?null:q2.docs[0];
 }
 
-window.sendRequest=async uid=>{
+async function renderPeople(list){
+const box=$("peopleList");
+box.innerHTML="";
+
+if(!list.length){
+box.innerHTML='<p class="empty">No people found.</p>';
+return;
+}
+
+for(const p of list){
+const el=document.createElement("div");
+el.className="item";
+
+let label="Connect";
+let disabled=false;
+
 try{
+const request=await getRequestBetween(currentUser.uid,p.uid);
+
+if(request){
+const d=request.data();
+
+if(d.status==="accepted"){
+label="Already Friends";
+disabled=true;
+}else if(d.status==="pending"&&d.senderUid===currentUser.uid){
+label="Cancel Request";
+}else if(d.status==="pending"){
+label="Respond to Request";
+}
+}
+}catch(e){
+console.error(e);
+}
+
+el.innerHTML=`
+<div class="row">
+${avatar(p)}
+<div><b>${esc(p.displayName)}</b><br>
+<small>@${esc(p.username||"member")}</small></div>
+<button class="connectBtn" ${disabled?"disabled":""}>${label}</button>
+</div>`;
+
+el.querySelector(".connectBtn").onclick=async()=>{
+try{
+const request=await getRequestBetween(currentUser.uid,p.uid);
+
+if(request){
+const d=request.data();
+
+if(d.status==="pending"&&d.senderUid===currentUser.uid){
+await deleteDoc(doc(db,"friendRequests",request.id));
+alert("Friend request cancelled.");
+}else if(d.status==="pending"){
+await showPage("requests");
+}else{
+alert("You are already friends.");
+}
+}else{
+await sendRequest(p.uid);
+}
+
+await loadPeople();
+}catch(e){
+alert(e.message);
+}
+};
+
+box.appendChild(el);
+}
+}
+
+/* FRIEND REQUESTS - FIXED */
+
+window.sendRequest=async uid=>{
+if(!currentUser||!uid||uid===currentUser.uid)return;
+
+try{
+const existing=await getRequestBetween(currentUser.uid,uid);
+
+if(existing){
+const d=existing.data();
+
+if(d.status==="accepted"){
+alert("You are already friends.");
+return;
+}
+
+if(d.status==="pending"){
+alert("A friend request already exists.");
+return;
+}
+}
+
 const id=currentUser.uid+"_"+uid;
-const r=doc(db,"friendRequests",id);
-const old=await getDoc(r);
-if(old.exists())return alert("Request already exists.");
-await setDoc(r,{
-senderUid:currentUser.uid,receiverUid:uid,
-status:"pending",createdAt:serverTimestamp()
+
+await setDoc(doc(db,"friendRequests",id),{
+senderUid:currentUser.uid,
+receiverUid:uid,
+status:"pending",
+createdAt:serverTimestamp()
 });
+
 await notify(uid,"friend_request","You received a friend request.");
-alert("Friend request sent.");
-}catch(e){alert(e.message);}
+
+alert("Friend request sent successfully!");
+}catch(e){
+alert("Friend request failed: "+e.message);
+}
 };
 
 async function loadRequests(){
 const box=$("requestList");
+const sentBox=$("sentRequestList");
+
 box.innerHTML="Loading...";
+sentBox.innerHTML="Loading...";
+
 try{
-const snap=await getDocs(query(collection(db,"friendRequests"),
+const incoming=await getDocs(query(
+collection(db,"friendRequests"),
 where("receiverUid","==",currentUser.uid),
-where("status","==","pending")));
+where("status","==","pending")
+));
+
 box.innerHTML="";
-for(const r of snap.docs){
-const d=r.data(),p=await profile(d.senderUid);
+
+for(const r of incoming.docs){
+const d=r.data();
+const p=await profile(d.senderUid);
+
 const el=document.createElement("div");
 el.className="item";
-el.innerHTML=`<b>${esc(p.displayName)}</b><small>@${esc(p.username||"member")}</small><div class="actions"><button class="yes">Accept</button><button class="no secondary">Decline</button></div>`;
+
+el.innerHTML=`
+<div class="row">
+${avatar(p)}
+<div><b>${esc(p.displayName)}</b><br>
+<small>@${esc(p.username||"member")}</small></div>
+</div>
+<div class="actions">
+<button class="yes">Accept</button>
+<button class="no secondary">Decline</button>
+</div>`;
+
 el.querySelector(".yes").onclick=async()=>{
-await updateDoc(doc(db,"friendRequests",r.id),{status:"accepted"});
+try{
+await updateDoc(doc(db,"friendRequests",r.id),{
+status:"accepted",
+acceptedAt:serverTimestamp()
+});
+
 await notify(d.senderUid,"friend_accepted","Your friend request was accepted.");
-loadRequests();
+
+alert("You are now friends!");
+await loadRequests();
+}catch(e){
+alert("Accept failed: "+e.message);
+}
 };
+
 el.querySelector(".no").onclick=async()=>{
+try{
 await deleteDoc(doc(db,"friendRequests",r.id));
-loadRequests();
+await loadRequests();
+}catch(e){
+alert("Decline failed: "+e.message);
+}
 };
+
 box.appendChild(el);
 }
-if(!snap.size)box.innerHTML='<p class="empty">No pending requests.</p>';
-}catch(e){box.textContent=e.message;}
+
+if(!incoming.size){
+box.innerHTML='<p class="empty">No pending requests.</p>';
 }
 
-async function getFriendIds(){
-const a=await getDocs(query(collection(db,"friendRequests"),
-where("senderUid","==",currentUser.uid),where("status","==","accepted")));
-const b=await getDocs(query(collection(db,"friendRequests"),
-where("receiverUid","==",currentUser.uid),where("status","==","accepted")));
-return [...new Set([
-...a.docs.map(x=>x.data().receiverUid),
-...b.docs.map(x=>x.data().senderUid)
-])];
+/* SENT REQUESTS */
+
+const outgoing=await getDocs(query(
+collection(db,"friendRequests"),
+where("senderUid","==",currentUser.uid),
+where("status","==","pending")
+));
+
+sentBox.innerHTML="";
+
+for(const r of outgoing.docs){
+const d=r.data();
+const p=await profile(d.receiverUid);
+
+const el=document.createElement("div");
+el.className="item";
+
+el.innerHTML=`
+<div class="row">
+${avatar(p)}
+<div><b>${esc(p.displayName)}</b><br>
+<small>@${esc(p.username||"member")}</small></div>
+<button class="cancel secondary">Cancel</button>
+</div>`;
+
+el.querySelector(".cancel").onclick=async()=>{
+try{
+await deleteDoc(doc(db,"friendRequests",r.id));
+await loadRequests();
+}catch(e){
+alert(e.message);
 }
+};
+
+sentBox.appendChild(el);
+}
+
+if(!outgoing.size){
+sentBox.innerHTML='<p class="empty">No sent requests.</p>';
+}
+
+}catch(e){
+box.textContent="Request error: "+e.message;
+sentBox.textContent="Request error: "+e.message;
+}
+}
+
+/* FRIENDS */
 
 async function loadFriends(){
 const box=$("friendsList");
-box.innerHTML="Loading...";
+box.innerHTML="Loading friends...";
+
 try{
-const ids=await getFriendIds();
-const friends=[];
-for(const uid of ids)friends.push(await profile(uid));
+const sent=await getDocs(query(
+collection(db,"friendRequests"),
+where("senderUid","==",currentUser.uid),
+where("status","==","accepted")
+));
+
+const received=await getDocs(query(
+collection(db,"friendRequests"),
+where("receiverUid","==",currentUser.uid),
+where("status","==","accepted")
+));
+
+const ids=new Set();
+
+sent.docs.forEach(r=>ids.add(r.data().receiverUid));
+received.docs.forEach(r=>ids.add(r.data().senderUid));
+
 box.innerHTML="";
-friends.forEach(p=>{
+
+for(const uid of ids){
+const p=await profile(uid);
 const el=document.createElement("div");
 el.className="item";
-el.innerHTML=`<div class="row">${avatar(p)}<div><b>${esc(p.displayName)}</b><br><small>@${esc(p.username||"member")}</small></div><button>Message</button></div>`;
-el.querySelector("button").onclick=()=>openChat(p.uid,p.displayName);
+
+el.innerHTML=`
+<div class="row">
+${avatar(p)}
+<div><b>${esc(p.displayName)}</b><br>
+<small>@${esc(p.username||"member")}</small></div>
+<button>Message</button>
+</div>`;
+
+el.querySelector("button").onclick=()=>openChat(uid);
 box.appendChild(el);
-});
-if(!ids.length)box.innerHTML='<p class="empty">Add friends to start chatting.</p>';
-}catch(e){box.textContent=e.message;}
 }
 
-window.openChat=async(uid,name)=>{
-if(uid===currentUser.uid)return;
-activeChat=pairId(currentUser.uid,uid);
-$("chatTitle").textContent=name||"Chat";
-$("messages").innerHTML="Loading...";
-await showPage("chat");
-startMessages();
-};
+if(!ids.size){
+box.innerHTML='<p class="empty">You have no friends yet. Discover people and connect!</p>';
+}
+}catch(e){
+box.textContent="Friends error: "+e.message;
+}
+}
 
-function startMessages(){
+/* PRIVATE CHATS */
+
+async function openChat(uid){
+try{
+const p=await profile(uid);
+const id=pairId(currentUser.uid,uid);
+
+activeChat={id,uid};
+
+await setDoc(doc(db,"chats",id),{
+participants:[currentUser.uid,uid],
+updatedAt:serverTimestamp()
+},{merge:true});
+
+$("chatTitle").textContent="Chat with "+(p.displayName||"Member");
+
+await showPage("chat");
+
+const q=query(
+collection(db,"chats",id,"messages"),
+orderBy("createdAt","asc")
+);
+
 if(stopMessages)stopMessages();
-const q=query(collection(db,"chats",activeChat,"messages"),
-orderBy("createdAt","asc"),limit(100));
+
 stopMessages=onSnapshot(q,snap=>{
 const box=$("messages");
 box.innerHTML="";
-snap.forEach(x=>{
-const d=x.data(),el=document.createElement("div");
-el.className="message"+(d.senderUid===currentUser.uid?" mine":"");
+
+snap.forEach(m=>{
+const d=m.data();
+const el=document.createElement("div");
+
+el.className="message "+(d.senderUid===currentUser.uid?"mine":"");
 el.textContent=d.text;
+
 box.appendChild(el);
 });
+
 box.scrollTop=box.scrollHeight;
-},e=>$("messages").textContent="Chat error: "+e.message);
+});
+}catch(e){
+alert("Chat error: "+e.message);
+}
 }
 
 window.sendMessage=async()=>{
+if(!activeChat)return;
+
 const text=$("messageInput").value.trim();
-if(!text||!activeChat)return;
+if(!text)return;
+
 try{
-const participants=activeChat.split("_");
-await setDoc(doc(db,"chats",activeChat),{
-participants,updatedAt:serverTimestamp(),lastMessage:text
-},{merge:true});
-await addDoc(collection(db,"chats",activeChat,"messages"),{
-senderUid:currentUser.uid,text,createdAt:serverTimestamp()
+await addDoc(collection(db,"chats",activeChat.id,"messages"),{
+senderUid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
 });
+
+await updateDoc(doc(db,"chats",activeChat.id),{
+lastMessage:text,
+updatedAt:serverTimestamp()
+});
+
 $("messageInput").value="";
-const other=participants.find(x=>x!==currentUser.uid);
-if(other)await notify(other,"message","You received a new message.");
-}catch(e){alert("Message error: "+e.message);}
+}catch(e){
+alert("Message failed: "+e.message);
+}
 };
 
 async function loadChatContacts(){
 const box=$("chatContacts");
 box.innerHTML="Loading chats...";
-const q=query(collection(db,"chats"),
-where("participants","array-contains",currentUser.uid));
+
+try{
+const q=query(
+collection(db,"chats"),
+where("participants","array-contains",currentUser.uid)
+);
+
 if(stopChatList)stopChatList();
+
 stopChatList=onSnapshot(q,async snap=>{
 box.innerHTML="";
-for(const d of snap.docs){
-const data=d.data();
-const other=(data.participants||[]).find(x=>x!==currentUser.uid);
-if(!other)continue;
-const p=await profile(other);
+
+for(const c of snap.docs){
+const d=c.data();
+const uid=d.participants.find(x=>x!==currentUser.uid);
+const p=await profile(uid);
+
 const el=document.createElement("div");
 el.className="item";
-el.innerHTML=`<div class="row">${avatar(p)}<div><b>${esc(p.displayName)}</b><br><small>${esc(data.lastMessage||"Start chatting")}</small></div><button>Open</button></div>`;
-el.querySelector("button").onclick=()=>openChat(other,p.displayName);
+
+el.innerHTML=`
+<div class="row">
+${avatar(p)}
+<div><b>${esc(p.displayName)}</b><br>
+<small>${esc(d.lastMessage||"Start chatting")}</small></div>
+<button>Open</button>
+</div>`;
+
+el.querySelector("button").onclick=()=>openChat(uid);
 box.appendChild(el);
 }
-if(!snap.size)box.innerHTML='<p class="empty">Your chats will appear here. Open a friend to message them.</p>';
-},e=>box.textContent=e.message);
+
+if(!snap.size){
+box.innerHTML='<p class="empty">No chats yet. Add friends to start chatting.</p>';
 }
+},e=>{
+box.textContent=e.message;
+});
+}catch(e){
+box.textContent=e.message;
+}
+}
+
+/* COMMUNITIES */
 
 window.createCommunity=async()=>{
 const name=$("communityName").value.trim();
 const description=$("communityDescription").value.trim();
+
 if(!name)return alert("Enter a community name.");
+
 try{
 const r=await addDoc(collection(db,"communities"),{
-name,description,ownerUid:currentUser.uid,createdAt:serverTimestamp()
+name,
+description,
+ownerUid:currentUser.uid,
+createdAt:serverTimestamp()
 });
+
 await setDoc(doc(db,"communities",r.id,"members",currentUser.uid),{
-uid:currentUser.uid,joinedAt:serverTimestamp()
+uid:currentUser.uid,
+joinedAt:serverTimestamp()
 });
+
 $("communityName").value="";
 $("communityDescription").value="";
-alert("Community created.");
-loadCommunities();
-}catch(e){alert(e.message);}
+
+alert("Community created!");
+await loadCommunities();
+}catch(e){
+alert(e.message);
+}
 };
 
 async function loadCommunities(){
 const box=$("communityList");
-box.innerHTML="Loading...";
-try{
-const snap=await getDocs(query(collection(db,"communities"),
-orderBy("createdAt","desc"),limit(100)));
-box.innerHTML="";
-snap.forEach(d=>{
-const c=d.data(),el=document.createElement("div");
-el.className="item";
-el.innerHTML=`<b>${esc(c.name)}</b><p class="muted">${esc(c.description||"")}</p><div class="actions"><button>Open community</button></div>`;
-el.querySelector("button").onclick=()=>openCommunity(d.id,c);
-box.appendChild(el);
-});
-if(!snap.size)box.innerHTML='<p class="empty">No communities yet. Create one!</p>';
-}catch(e){box.textContent=e.message;}
-}
+box.innerHTML="Loading communities...";
 
-async function openCommunity(id,c){
-activeCommunity=id;
-$("communityTitle").textContent=c.name;
-$("communityAbout").textContent=c.description||"";
-await showPage("community");
-const memberRef=doc(db,"communities",id,"members",currentUser.uid);
-const member=await getDoc(memberRef);
-$("communityControls").innerHTML="";
-if(!member.exists()){
-const b=document.createElement("button");
-b.textContent="Join Community";
-b.onclick=async()=>{
-await setDoc(memberRef,{uid:currentUser.uid,joinedAt:serverTimestamp()});
-openCommunity(id,c);
-};
-$("communityControls").appendChild(b);
-$("communityComposer").classList.add("hidden");
-}else{
-$("communityComposer").classList.remove("hidden");
-const b=document.createElement("button");
-b.className="secondary";
-b.textContent="Leave Community";
-b.onclick=async()=>{
-await deleteDoc(memberRef);
-openCommunity(id,c);
-};
-$("communityControls").appendChild(b);
-}
-await loadCommunityPosts();
-}
-
-async function loadCommunityPosts(){
-const box=$("communityPosts");
-box.innerHTML='<div class="card">Loading posts...</div>';
 try{
 const snap=await getDocs(query(
-collection(db,"communities",activeCommunity,"posts"),
-orderBy("createdAt","desc"),limit(50)));
+collection(db,"communities"),
+orderBy("createdAt","desc")
+));
+
 box.innerHTML="";
-for(const d of snap.docs){
-const x=d.data(),p=await profile(x.uid),el=document.createElement("div");
-el.className="card";
-el.innerHTML=`<b>${esc(p.displayName)}</b><p class="post">${esc(x.text)}</p>`;
+
+for(const c of snap.docs){
+const d=c.data();
+const el=document.createElement("div");
+el.className="item";
+
+el.innerHTML=`
+<b>${esc(d.name)}</b>
+<p class="muted">${esc(d.description||"")}</p>
+<button>Open Community</button>`;
+
+el.querySelector("button").onclick=()=>openCommunity(c.id);
 box.appendChild(el);
 }
-if(!snap.size)box.innerHTML='<div class="card empty">No community posts yet.</div>';
-}catch(e){box.innerHTML=esc(e.message);}
+
+if(!snap.size){
+box.innerHTML='<p class="empty">No communities yet.</p>';
+}
+}catch(e){
+box.textContent=e.message;
+}
+}
+
+async function openCommunity(id){
+activeCommunity=id;
+
+const s=await getDoc(doc(db,"communities",id));
+if(!s.exists())return alert("Community not found.");
+
+const d=s.data();
+
+$("communityTitle").textContent=d.name;
+$("communityAbout").textContent=d.description||"";
+await showPage("community");
+
+const memberRef=doc(db,"communities",id,"members",currentUser.uid);
+const member=await getDoc(memberRef);
+
+const controls=$("communityControls");
+controls.innerHTML="";
+
+const btn=document.createElement("button");
+btn.textContent=member.exists()?"Leave Community":"Join Community";
+
+btn.onclick=async()=>{
+try{
+if(member.exists()){
+await deleteDoc(memberRef);
+}else{
+await setDoc(memberRef,{
+uid:currentUser.uid,
+joinedAt:serverTimestamp()
+});
+}
+await openCommunity(id);
+}catch(e){
+alert(e.message);
+}
+};
+
+controls.appendChild(btn);
+
+$("communityComposer").classList.toggle("hidden",!member.exists());
+
+const posts=await getDocs(query(
+collection(db,"communities",id,"posts"),
+orderBy("createdAt","desc")
+));
+
+const box=$("communityPosts");
+box.innerHTML="";
+
+for(const p of posts.docs){
+const x=p.data();
+const user=await profile(x.uid);
+const el=document.createElement("div");
+el.className="card";
+
+el.innerHTML=`
+<b>${esc(user.displayName)}</b>
+<div class="post">${esc(x.text)}</div>`;
+
+box.appendChild(el);
+}
 }
 
 window.sendCommunityPost=async()=>{
+if(!activeCommunity)return;
+
 const text=$("communityPostInput").value.trim();
-if(!text||!activeCommunity)return;
+if(!text)return;
+
 try{
-const member=await getDoc(doc(db,"communities",activeCommunity,"members",currentUser.uid));
-if(!member.exists())return alert("Join this community first.");
 await addDoc(collection(db,"communities",activeCommunity,"posts"),{
-uid:currentUser.uid,text,createdAt:serverTimestamp()
+uid:currentUser.uid,
+text,
+createdAt:serverTimestamp()
 });
+
 $("communityPostInput").value="";
-loadCommunityPosts();
-}catch(e){alert(e.message);}
+await openCommunity(activeCommunity);
+}catch(e){
+alert(e.message);
+}
 };
+
+/* NOTIFICATIONS */
 
 async function loadNotifications(){
 const box=$("notificationList");
 box.innerHTML="Loading...";
+
 try{
-const snap=await getDocs(query(collection(db,"notifications"),
+const snap=await getDocs(query(
+collection(db,"notifications"),
 where("to","==",currentUser.uid),
-orderBy("createdAt","desc"),limit(50)));
+orderBy("createdAt","desc"),
+limit(50)
+));
+
 box.innerHTML="";
-snap.forEach(d=>{
-const x=d.data(),el=document.createElement("div");
+
+for(const n of snap.docs){
+const d=n.data();
+const el=document.createElement("div");
 el.className="item";
-el.textContent=x.message||x.type||"Notification";
+
+el.textContent=d.message||"New notification";
+
 box.appendChild(el);
-if(!x.read)updateDoc(doc(db,"notifications",d.id),{read:true}).catch(()=>{});
+
+if(!d.read){
+await updateDoc(doc(db,"notifications",n.id),{
+read:true
 });
-if(!snap.size)box.innerHTML='<p class="empty">No notifications yet.</p>';
-}catch(e){box.textContent="Notification error: "+e.message;}
 }
+}
+
+if(!snap.size){
+box.innerHTML='<p class="empty">No notifications yet.</p>';
+}
+}catch(e){
+box.textContent="Notification error: "+e.message;
+}
+}
+
 </script>
 </body>
 </html>
